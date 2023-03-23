@@ -1,7 +1,7 @@
 
 void linearizzazione(){
 
-    ifstream file("dati.dat");
+    ifstream file("TOT_4.lvm");
 
     auto gr1 = new TGraphErrors(); //grafico dei dati
     auto gr2 = new TGraphErrors(); //grafico linearizzato
@@ -18,14 +18,34 @@ void linearizzazione(){
     double t_max = 0; //tempo corrispondende al massimo della temperatura
     double d = 0.021; //distanza della misuraione della temperatura dall estremo a cui diamo l impulso
     double cost_conversione = 41e-6;
-    while (file >> VImpulso >> t >> VSbarra >> VRes)
+    bool control_time = true;
+    double t1;
+    double guadagno = 2000;
+    while (file >> VImpulso >> t >> VRes >> VSbarra)
     {
-        if (VRes > VRes_max)
+        
+        //MANCA IL CALCOLO DELLE DIFFERENZA DELLA TENSIONE VRES PER IL CALCOLO DELLA RESISTENZA DELLA PT100        
+        if (control_time)
         {
-            /* code */
+            t1 = t;
+            control_time = false;
+        }
+        if ((t-t1) > 0.2)
+        {
+            if (VRes >= VRes_max)
+            {
+                VRes_max = VRes;
+            }
+            else if(VRes <= VRes_min)
+            {
+                VRes_min = VRes;
+            }
+            dVRes = abs(VRes_max-VRes_min);
+            control_time = true;
         }
         
-        TSbarra = VSbarra/cost_conversione;
+        
+        TSbarra = VSbarra/(guadagno*cost_conversione);
         R_pt100 = dVRes/I;
         TRes = 14e-04*pow(R_pt100,2) + 2.2959 * R_pt100 + 29.77;
         if (TSbarra > temp_max) //cerco il massimo della temperatura
@@ -35,9 +55,9 @@ void linearizzazione(){
         }
 
         gr1->SetPoint(i,t,TSbarra);
-        if(t != 0)
+        if(t >= 0.001)
         {
-            gr2->SetPoint(i, 1./t, log((TSbarra-TRes)*sqrt(t)));
+            gr2->SetPoint(i, 1./t, log(abs(TSbarra-TRes)*sqrt(t)));
         }
         i++;
     }
@@ -57,8 +77,8 @@ void linearizzazione(){
     c2->cd();
     gr2->Draw("AP");
 
-    auto f2 = new TF1("f2","log([0]/sqrt([1]))+x*(([2]*[2])/(4*[1]))",0.,0.);
-    auto f1 = new TF1("f1","[0]*sqrt(x)/(sqrt([1]))*exp(-([3]*[3])*x/(4*[1]))+[2]",0.,0.);
+    auto f2 = new TF1("f2","log([0]/sqrt([1]))+x*(([2]*[2])/(4*[1]))",0.035,0.077); //fit lineare
+    auto f1 = new TF1("f1","-1*[0]*sqrt(x)/(sqrt([1]))*exp(-([3]*[3])*x/(4*[1]))+[2]",13,30);
 
     f1->SetParameters(40, ord_D, TRes, d);
     f2->SetParameters(40, ord_D, d); //[0] = conducubilita
@@ -79,4 +99,6 @@ void linearizzazione(){
     double D2 = -(d*d)/(4*coeff_ang);
     cout << "il valore di D ottenuto con il metodo di linearizzazione: " << D2 << endl;
 
+    gr2->RemovePoint(0);
+    gr2->Print();
 };
