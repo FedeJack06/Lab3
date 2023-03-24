@@ -10,9 +10,6 @@ void linearizzazione(){
     double e_VSbarra = 0.0035/(2*sqrt(3));
     double TSbarra,TRes,t; //ingressi
     double VSbarra,VRes;
-    double VRes_max = 0;
-    double VRes_min = 0;
-    double dVRes = 0;
     double VImpulso,R_pt100;
     double I = 0.001;
     double temp_max = 10; //massimo della temperatura
@@ -27,7 +24,6 @@ void linearizzazione(){
         //MANCA IL CALCOLO DELLE DIFFERENZA DELLA TENSIONE VRES PER IL CALCOLO DELLA RESISTENZA DELLA PT100 
         
         TSbarra = VSbarra/(guadagno*cost_conversione);
-        R_pt100 = dVRes/I;
         TRes = 14e-04*pow(R_pt100,2) + 2.2959 * R_pt100 + 29.77;
         if (TSbarra <= temp_max) //cerco il massimo della temperatura
         {
@@ -36,11 +32,13 @@ void linearizzazione(){
         }
 
         gr1->SetPoint(i,t,TSbarra);
+        gr1->SetPointError(i,0.00001,e_VSbarra/(guadagno*cost_conversione));
         double k = log(TSbarra*sqrt(t));
-        if((t >= 14) && (k < 10) && (k > 0) && (1/t > 0.005))
-        //if((t >= 14))
+        //if((t >= 14) && (k < 10) && (k > 0) && (1/t > 0.005))
+        if((t > 0))
         {
             gr2->SetPoint(gr2->GetN(), 1./t, k);
+            //gr2->SetPointError(gr2->GetN(),(1/(pow(t,4)))*1e-5, (1/(4*t*t))*1e-10+(1/TSbarra*TSbarra)*(e_VSbarra/(guadagno*cost_conversione)));
         }
         i++;
     }
@@ -52,7 +50,7 @@ void linearizzazione(){
     auto c1 = new TCanvas();
     auto c2 = new TCanvas();
 
-    gr1->SetMarkerStyle(20);
+    gr1->SetMarkerStyle(7);
     gr2->SetMarkerStyle(20);
 
     c1->cd();
@@ -61,17 +59,19 @@ void linearizzazione(){
     c2->cd();
     gr2->Draw("AP");
 
-    auto f2 = new TF1("f2","log([0]/sqrt([1]))+x*(([2]*[2])/(4*[1]))",0.033,0.073); //fit lineare
-    auto f1 = new TF1("f1","-1*[0]/(sqrt([1])*sqrt(x))*exp(-([3]*[3])/(4*[1]*x))+[2]",13.7,30);
+    
+    auto f2 = new TF1("f2","log([0]/sqrt([1]))+x*(([2]*[2])/(4*[1]))",0.0452,0.068); //fit lineare
+    auto f1 = new TF1("f1","-1*[0]/(sqrt([1])*sqrt(x))*exp(-([3]*[3])/(4*[1]*x))+[2]",14.7,27);
+
 
     f1->SetParameters(0.4, 9.9e-6, 4, d);
-    f1->FixParameter(3, d);
+    //f1->FixParameter(3, d);
     f2->SetParameters(0.4, ord_D, d); //[0] Costante, [1] D, [2] distanza
 
-    // f1->SetParLimits(1,1e-03,1e-08);
-    // f1->SetParLimits(3,0.018,0.024);
-    f1->SetParLimits(2,0,10);
-    f1->SetParLimits(0,-1,3);
+    //f1->SetParLimits(1,1e-03,1e-08);
+    f1->SetParLimits(3,0.018,0.024);
+    //f1->SetParLimits(2,0,10);
+    //f1->SetParLimits(0,-1,3);
 //FIT T(t)
     gr1->Fit("f1","R");
     double p1 = f1->GetProb();
