@@ -1,7 +1,7 @@
 
 void linearizzazione(){
 
-    ifstream file("TOT_4.lvm");
+    ifstream file("TOT_1.lvm");
 
     auto gr1 = new TGraphErrors(); //grafico dei dati
     auto gr2 = new TGraphErrors(); //grafico linearizzato
@@ -52,10 +52,6 @@ void linearizzazione(){
         }
         i++;
     }
-    
-    double ord_D = (d*d)/(2*t_max);
-    //cout << t_max << endl;
-    cout << "il valore di D usando il valore massimo di temperatura ad x fissato è: " << ord_D << endl;
 
     auto c1 = new TCanvas();
     auto c2 = new TCanvas();
@@ -69,10 +65,15 @@ void linearizzazione(){
     c2->cd();
     gr2->GetXaxis()->SetRange(0.,10.);
     gr2->Draw("AP");
+    gr2->Print();
+
+    double ord_D = (d*d)/(2*t_max);
+    //cout << t_max << endl;
+    cout << "il valore di D usando il valore massimo di temperatura ad x fissato è: " << ord_D << endl;
 
 
     auto f1 = new TF1("f1","-1*[0]/(sqrt([1])*sqrt(x))*exp(-([3]*[3])/(4*[1]*x))+[2]",14.7,27);
-    auto f2 = new TF1("f2","log([0]/sqrt([1]))-x*(([2]*[2])/(4*[1]))",0.037,0.068); //fit lineare 0.0452,0.068
+    auto f2 = new TF1("f2","log([0]/sqrt([1]))-x*([2]*[2])/(4*[1])",0.037,0.068); //fit lineare 0.0452,0.068
     
 
     f1->SetParameters(0.4, 9.9e-6, 4, d);
@@ -98,5 +99,5 @@ void linearizzazione(){
     cout << "il valore di D ottenuto con il metodo di linearizzazione: " << D2 << endl;
 
     //gr2->RemovePoint(0);
-    gr2->Print();
+    
 };
