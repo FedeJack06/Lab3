@@ -1,10 +1,11 @@
 
 void linearizzazione(){
 
-    ifstream file("TOT_1.lvm");
+    ifstream file("TOT_4.lvm");
 
     auto gr1 = new TGraphErrors(); //grafico dei dati
     auto gr2 = new TGraphErrors(); //grafico linearizzato
+    auto gr3 = new TGraphErrors();
 
     int i = 0;
     double e_VSbarra = 0.0035/(2*sqrt(3));
@@ -42,6 +43,8 @@ void linearizzazione(){
 
         gr1->SetPoint(i,t,abs(TSbarra-offset));
         gr1->SetPointError(i,0.00001,e_VSbarra/(guadagno*cost_conversione));
+
+        gr3->SetPoint(i,t,VImpulso/10);
         double k = log((abs(TSbarra-offset))*sqrt(t));
         //if((t >= 14) && (k < 10) && (k > 0) && (1/t > 0.005))
         if(t > 0)
@@ -49,6 +52,7 @@ void linearizzazione(){
             int npunti = gr2->GetN();
             gr2->SetPoint(npunti, 1./t, k);
             gr2->SetPointError(npunti,(1/(pow(t,4)))*1e-5, (1/(4*t*t))*1e-10+(1/TSbarra*TSbarra)*(e_VSbarra/(guadagno*cost_conversione)));
+
         }
         i++;
     }
@@ -58,9 +62,12 @@ void linearizzazione(){
 
     gr1->SetMarkerStyle(7);
     gr2->SetMarkerStyle(7);
+    gr3->SetMarkerStyle(20);
+    gr3->SetMarkerColor(kRed);
 
     c1->cd();
     gr1->Draw("AP");
+    gr3->Draw("P");
 
     c2->cd();
     gr2->GetXaxis()->SetRange(0.,10.);
