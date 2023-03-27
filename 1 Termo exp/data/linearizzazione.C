@@ -1,7 +1,7 @@
 
 void linearizzazione(){
 
-    ifstream file("tot_4.lvm");
+    ifstream file("TOT_4.lvm");
 
     auto gr1 = new TGraphErrors(); //grafico dei dati
     auto gr2 = new TGraphErrors(); //grafico linearizzato
@@ -19,26 +19,36 @@ void linearizzazione(){
     bool control_time = true;
     double t1;
     double guadagno = 2060;
+    //media temp t<12 per togliere offset
+    double sommaOffset;
+    double countOffset;
     while (file >> VImpulso >> t >> VRes >> VSbarra)
     {
         //MANCA IL CALCOLO DELLE DIFFERENZA DELLA TENSIONE VRES PER IL CALCOLO DELLA RESISTENZA DELLA PT100 
-        
         TSbarra = VSbarra/(guadagno*cost_conversione);
         TRes = 14e-04*pow(R_pt100,2) + 2.2959 * R_pt100 + 29.77;
+
+        if(t<12){
+            sommaOffset += TSbarra;
+            countOffset++;
+        }
+        double offset= sommaOffset/countOffset;
+        
         if (TSbarra <= temp_max) //cerco il massimo della temperatura
         {
             temp_max = TSbarra;
             t_max = t;
         }
 
-        gr1->SetPoint(i,t,TSbarra);
+        gr1->SetPoint(i,t,abs(TSbarra-offset));
         gr1->SetPointError(i,0.00001,e_VSbarra/(guadagno*cost_conversione));
-        double k = log(TSbarra*sqrt(t));
+        double k = log((abs(TSbarra-offset))*sqrt(t));
         //if((t >= 14) && (k < 10) && (k > 0) && (1/t > 0.005))
-        if((t > 0))
+        if(t > 0)
         {
-            gr2->SetPoint(gr2->GetN(), 1./t, k);
-            //gr2->SetPointError(gr2->GetN(),(1/(pow(t,4)))*1e-5, (1/(4*t*t))*1e-10+(1/TSbarra*TSbarra)*(e_VSbarra/(guadagno*cost_conversione)));
+            int npunti = gr2->GetN();
+            gr2->SetPoint(npunti, 1./t, k);
+            gr2->SetPointError(npunti,(1/(pow(t,4)))*1e-5, (1/(4*t*t))*1e-10+(1/TSbarra*TSbarra)*(e_VSbarra/(guadagno*cost_conversione)));
         }
         i++;
     }
@@ -51,7 +61,7 @@ void linearizzazione(){
     auto c2 = new TCanvas();
 
     gr1->SetMarkerStyle(7);
-    gr2->SetMarkerStyle(20);
+    gr2->SetMarkerStyle(7);
 
     c1->cd();
     gr1->Draw("AP");
@@ -59,10 +69,10 @@ void linearizzazione(){
     c2->cd();
     gr2->Draw("AP");
 
-    
-    auto f2 = new TF1("f2","log([0]/sqrt([1]))+x*(([2]*[2])/(4*[1]))",0.0452,0.068); //fit lineare
-    auto f1 = new TF1("f1","-1*[0]/(sqrt([1])*sqrt(x))*exp(-([3]*[3])/(4*[1]*x))+[2]",14.7,27);
 
+    auto f1 = new TF1("f1","-1*[0]/(sqrt([1])*sqrt(x))*exp(-([3]*[3])/(4*[1]*x))+[2]",14.7,27);
+    auto f2 = new TF1("f2","log([0]/sqrt([1]))-x*(([2]*[2])/(4*[1]))",0.037,0.068); //fit lineare 0.0452,0.068
+    
 
     f1->SetParameters(0.4, 9.9e-6, 4, d);
     //f1->FixParameter(3, d);
