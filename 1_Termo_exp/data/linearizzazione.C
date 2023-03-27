@@ -67,6 +67,7 @@ void linearizzazione(){
     gr1->Draw("AP");
 
     c2->cd();
+    gr2->GetXaxis()->SetRange(0.,10.);
     gr2->Draw("AP");
 
 
@@ -96,6 +97,6 @@ void linearizzazione(){
     double D2 = f2->GetParameter(1);
     cout << "il valore di D ottenuto con il metodo di linearizzazione: " << D2 << endl;
 
-    // gr2->RemovePoint(0);
-    //gr2->Print();
+    //gr2->RemovePoint(0);
+    gr2->Print();
 };
