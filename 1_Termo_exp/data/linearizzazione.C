@@ -57,22 +57,32 @@ void linearizzazione(){
         i++;
     }
 
-    auto c1 = new TCanvas();
-    auto c2 = new TCanvas();
+    auto c1 = new TCanvas("deltaT");
+    auto c2 = new TCanvas("deltaT_log");
 
     gr1->SetMarkerStyle(7);
+    gr1->SetTitle("Temperatura differenziale");
+    gr1->GetXaxis()->SetTitle("Tempo [s]");
+    gr1->GetYaxis()->SetTitle("differenza temperatura [K]");
+
     gr2->SetMarkerStyle(7);
-    gr3->SetMarkerStyle(20);
+    gr2->SetTitle("Temperatura differenziale log");
+    gr2->GetXaxis()->SetTitle("1/tempo [1/s]");
+    gr2->GetYaxis()->SetTitle("delta T * rad(tempo) [Ks^1/2]");
+
+    gr3->SetMarkerStyle(7);
     gr3->SetMarkerColor(kRed);
 
     c1->cd();
     gr1->Draw("AP");
-    gr3->Draw("P");
+    //gr3->Draw("P");
 
     c2->cd();
     gr2->GetXaxis()->SetRange(0.,10.);
     gr2->Draw("AP");
-    gr2->Print();
+    //gr2->Print();
+
+    gStyle->SetOptFit();
 
     double ord_D = (d*d)/(2*t_max);
     //cout << t_max << endl;
