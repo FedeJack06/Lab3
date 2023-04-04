@@ -1,8 +1,6 @@
 {
-   string fileName; 
-   cout<<"File Fit:"<<flush;
-   cin>>fileName;
-
+   string fileName = "suono";
+   
    /* controllo che il file esista e sia leggibile */
    ifstream inputfile(fileName); 
    if (!inputfile.good()) {  
@@ -51,7 +49,7 @@
    f.SetParameter(1,1);
 
    /* plot dei dati */
-   gStyle->SetOptFit();
+   gStyle->SetOptFit(1011);
    TCanvas c1("c1","canvas1",1920,1080);
    c1.cd();
    gr.Draw("AP");
