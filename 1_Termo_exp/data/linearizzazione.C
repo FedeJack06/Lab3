@@ -89,18 +89,12 @@ void linearizzazione(){
     cout << "il valore di D usando il valore massimo di temperatura ad x fissato è: " << ord_D << endl;
 
 
-    auto f1 = new TF1("f1","-1*[0]/(sqrt([1])*sqrt(x))*exp(-([3]*[3])/(4*[1]*x))+[2]",14.7,27);
+    auto f1 = new TF1("f1","[0]*exp(-([2]*[2])/(4*[1]*x))/sqrt([1]*x) + [3]",14.7,27); //0 = C, 1 = D, 2 = dist, 3 = offset
     auto f2 = new TF1("f2","log([0]/sqrt([1]))-x*([2]*[2])/(4*[1])",0.037,0.068); //fit lineare 0.0452,0.068
     
-
-    f1->SetParameters(0.4, 9.9e-6, 4, d);
-    //f1->FixParameter(3, d);
+    f1->SetParameters(0.4, 9.9e-6, d, 0);
     f2->SetParameters(0.4, ord_D, d); //[0] Costante, [1] D, [2] distanza
-
-    //f1->SetParLimits(1,1e-03,1e-08);
-    f1->SetParLimits(3,0.018,0.024);
-    //f1->SetParLimits(2,0,10);
-    //f1->SetParLimits(0,-1,3);
+   
 //FIT T(t)
     gr1->Fit("f1","R");
     double p1 = f1->GetProb();
