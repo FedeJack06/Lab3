@@ -90,10 +90,12 @@ void linearizzazione(){
 
 
     auto f1 = new TF1("f1","[0]*exp(-([2]*[2])/(4*[1]*x))/sqrt([1]*x) + [3]",14.7,27); //0 = C, 1 = D, 2 = dist, 3 = offset
-    auto f2 = new TF1("f2","log([0]/sqrt([1]))-x*([2]*[2])/(4*[1])",0.037,0.068); //fit lineare 0.0452,0.068
+    auto f2 = new TF1("f2","log([0]/sqrt([1]))-x*([2]*[2])/(4*[1])",0.037,0.068);      //0 = C, 1 = D, 2 = dist
     
     f1->SetParameters(0.4, 9.9e-6, d, 0);
+    f1->FixParameter(2, d);
     f2->SetParameters(0.4, ord_D, d); //[0] Costante, [1] D, [2] distanza
+    f2->FixParameter(2, d);
    
 //FIT T(t)
     gr1->Fit("f1","R");
