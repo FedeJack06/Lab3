@@ -1,7 +1,7 @@
 
 void linearizzazione(){
 
-    ifstream file("TOT_4.lvm");
+    ifstream file("TOT_1.lvm");
 
     auto gr1 = new TGraphErrors(); //grafico dei dati
     auto gr2 = new TGraphErrors(); //grafico linearizzato
