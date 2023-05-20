@@ -59,4 +59,4 @@
 
    // Fit con la funzione f (che viene automaticamente graficata sui dati)
    gr.Fit("f");
-}
+};
