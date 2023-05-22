@@ -1,4 +1,8 @@
-void optAct(){
+
+// E' un banalissimo fit lineare
+// **********************************************************
+
+void attOtt(){
 
     ifstream file("dati.dat");
     double conc,angolo;
@@ -12,8 +16,8 @@ void optAct(){
         i++;
     }
 
-    auto f = new TF1("f","[0]+[1]*(x-[2])",0.,0.);
-    f->SetParameters(0,1,0);
+    auto f = new TF1("f","[0]+[1]*(x)",0.,0.);
+    f->SetParameters(0,1);
 
     gStyle->SetOptFit(1011);
     gr->SetMarkerStyle(20);
