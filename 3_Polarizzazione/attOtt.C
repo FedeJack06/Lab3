@@ -4,15 +4,16 @@
 
 void attOtt(){
 
-    ifstream file("dati.dat");
+    ifstream file("conc.dat");
     double conc,angolo;
     auto gr = new TGraphErrors();
+    double e = 2*TMath::Pi()/100;
 
     int i = 0;
     while (file >> conc >> angolo)
     {
         gr->SetPoint(i, angolo, conc);
-        gr->SetPointError(i, 0, 0);
+        gr->SetPointError(i, 0, e);
         i++;
     }
 
