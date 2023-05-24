@@ -5,7 +5,7 @@
 //0.125 0.0451397
 void malus(){
 
-    ifstream file("malus.dat");
+    ifstream file("ottavo.dat");
     double Iout,theta,eI;
     double e = 2*TMath::Pi()/100;
 
@@ -19,13 +19,8 @@ void malus(){
     }
 
     //auto f1 = new TF1("f1","[0]*pow(cos(x-[1]),2)",0.,0.);
-    auto f1 = new TF1("f1","[0]*pow(cos(x-[1]),2)+[3]",0.,0.);
+    auto f1 = new TF1("f1","[0]*pow(cos(x-[1]),2)+[2]",0.,0.);
     f1->SetParameters(0.3,0.1,0.01);
-    f1->SetParameters(0.3,0);
-    //f1->SetParLimits(2,0,0.5);
-    //f1->SetParLimits(0,2,0.3);
-    //f1->SetParLimits(1,-2,2);
-    //f1->SetParLimits(3,0,0.05);
     gStyle->SetOptFit(1011);
     gr->SetMarkerStyle(20);
     gr->Draw("AP");
